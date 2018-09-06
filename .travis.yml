@@ -1,0 +1,17 @@
+sudo: required
+env:
+  global:
+    - DOCKER_REPO=kenorbos/ubuntu-base
+services:
+  - docker
+script:
+  - make
+after_success:
+  - docker run $DOCKER_REPO df -h
+  - docker run $DOCKER_REPO find / -type f -size +10M -ls
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD;
+      make push;
+    fi
+after_script:
+  - docker images
